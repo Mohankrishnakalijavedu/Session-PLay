@@ -1,48 +1,68 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import Reactions from "./src";
 import "./App.css";
-
-const images = [
-  { id: "like", description: "Like", img: "http://i.imgur.com/LwCYmcM.gif" },
-  { id: "love", description: "Love", img: "http://i.imgur.com/k5jMsaH.gif" },
-  { id: "haha", description: "Haha", img: "http://i.imgur.com/f93vCxM.gif" },
-  { id: "yay", description: "Yay", img: "http://i.imgur.com/a44ke8c.gif" },
-  { id: "wow", description: "Wow", img: "http://i.imgur.com/9xTkN93.gif" },
-  { id: "sad", description: "Sad", img: "http://i.imgur.com/tFOrN5d.gif" },
-  { id: "angry", description: "Angry", img: "http://i.imgur.com/1MgcQg0.gif" },
-];
-
+import {View, Switch, StyleSheet} from 'react-native';
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      reaction: "Like",
-      active: false,
-    };
+
+    this.state = { isSessionActive: true };
+    this.events = [
+      "load",
+      "mousemove",
+      "mousedown",
+      "click",
+      "scroll",
+      "keypress",
+    ];
+
+    this.logout = this.logout.bind(this);
+    this.resetTimeout = this.resetTimeout.bind(this);
+
+    for (var i in this.events) {
+      window.addEventListener(this.events[i], this.resetTimeout);
+    }
+    this.setTimeout();
   }
 
-  onUpdate(id) {
-    let reaction = images.filter((e) => e.id == id)[0].description;
-    this.setState({
-      reactionId: id,
-      reaction: reaction,
-      active: true,
-    });
+  clearTimeout() {
+    if (this.logoutTimeout) clearTimeout(this.logoutTimeout);
+  }
+
+  setTimeout() {
+    this.logoutTimeout = setTimeout(this.logout, 10 * 60000);
+  }
+
+  resetTimeout() {
+    this.clearTimeout();
+    this.setTimeout();
+  }
+
+  warn() {
+    alert("You are loggedout.");
+  }
+
+  logout() {
+    this.setState({ isSessionActive: false });
+    this.warn();
+  }
+
+  toogleButton() {
+    this.state.isSessionActive ? this.logout() : window.location.reload(true);
   }
 
   render() {
-    const { reaction, reactionId, active } = this.state;
-    const likeStyle = `button ${reactionId} ${active ? "" : "inactive"}`;
-
     return (
-      <div className="container">
-        <div className="buttons">
-          <Reactions onUpdate={this.onUpdate.bind(this)} items={images}>
-            <button className={likeStyle}>{reaction}</button>
-          </Reactions>
-        </div>
-      </div>
+      <View className="App">
+        <h1>Session auto logout after 10 mins automatically!!</h1>
+        <h2>Status :{this.state.isSessionActive ? "Logged In" : "Logged Out"}</h2>
+         <Switch
+          trackColor={{false: 'gray', true: 'teal'}}
+          thumbColor="white"
+          ios_backgroundColor="gray"
+          onValueChange={() => this.toogleButton()}
+          value={this.state.isSessionActive}
+        />
+      </View>
     );
   }
 }
