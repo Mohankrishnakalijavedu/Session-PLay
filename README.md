@@ -8,4 +8,4 @@
    1. Logs out the user when the app is in the background state for more than 10 minutes. 
    2. Logs out the user when the app is closed.
 
-## Please install latest node modules and run -- npm run web to check the out put in web mode
+Please install latest node modules and run -- npm run web to check the out put in web mode
